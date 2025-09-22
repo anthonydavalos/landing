@@ -1,5 +1,5 @@
 // Mariachis Los Peruchos - JS
-(function(){
+(function () {
   const PHONE = '51998693529';
   const BASE_WA = `https://wa.me/${PHONE}`;
 
@@ -16,8 +16,8 @@
 
   const defaultMsg = `Hola, quisiera una cotización para una serenata con Mariachis Los Peruchos en Lima. ${quick}. Fecha: ____ , Distrito: ____ , Paquete: ____ .`;
 
-  function buildWaLink(origin){
-    const text = encodeURIComponent(defaultMsg + ` (Origen: ${origin})`);
+  function buildWaLink(origin) {
+    const text = defaultMsg + ` (Origen: ${origin})`;
     const url = new URL(BASE_WA);
     url.searchParams.set('text', text);
     url.searchParams.set('utm_source', utmSource);
@@ -28,7 +28,7 @@
     return url.toString();
   }
 
-  function wireCtas(){
+  function wireCtas() {
     const ctas = document.querySelectorAll('[id^="cta-whatsapp-"]');
     ctas.forEach(a => {
       const origin = a.getAttribute('data-origin') || 'cta';
@@ -38,35 +38,35 @@
       a.addEventListener('click', () => {
         // gtag conversion si existe
         if (typeof gtag === 'function') {
-          try { gtag('event', 'conversion', { send_to: 'AW-CONVERSION_ID/label' }); } catch(e){}
+          try { gtag('event', 'conversion', { send_to: 'AW-CONVERSION_ID/label' }); } catch (e) { }
         }
       });
     });
   }
 
   // Year in footer
-  function setYear(){
+  function setYear() {
     const el = document.getElementById('year');
     if (el) el.textContent = String(new Date().getFullYear());
   }
 
   // Play teaser muted on hover in some browsers
-  function enhanceTeaser(){
+  function enhanceTeaser() {
     const v = document.getElementById('teaser-video');
     if (!v) return;
-    v.addEventListener('mouseenter', ()=> v.play().catch(()=>{}));
-    v.addEventListener('focus', ()=> v.play().catch(()=>{}));
+    v.addEventListener('mouseenter', () => v.play().catch(() => { }));
+    v.addEventListener('focus', () => v.play().catch(() => { }));
   }
 
   // Lazy start playing videos when visible (if not using controls)
-  function lazyAutoplay(){
+  function lazyAutoplay() {
     const videos = document.querySelectorAll('#videos video');
     if (!('IntersectionObserver' in window)) return;
     const io = new IntersectionObserver(entries => {
       entries.forEach(e => {
         if (e.isIntersecting) {
           const v = e.target;
-          if (v.autoplay) v.play().catch(()=>{});
+          if (v.autoplay) v.play().catch(() => { });
           io.unobserve(v);
         }
       });
@@ -75,22 +75,22 @@
   }
 
   // Generar poster desde el primer frame para videos de la galería
-  function generatePosters(){
+  function generatePosters() {
     const videos = document.querySelectorAll('#videos video');
     videos.forEach((v, index) => {
       // Intentar generar poster real desde el video como mejora
       const attemptPosterGeneration = () => {
-        try{
+        try {
           if (!v.videoWidth || !v.videoHeight) return;
           const canvas = document.createElement('canvas');
-          canvas.width = v.videoWidth; 
+          canvas.width = v.videoWidth;
           canvas.height = v.videoHeight;
           const ctx = canvas.getContext('2d');
           if (!ctx) return;
-          
+
           // Ir al segundo 1 para mejor frame
           v.currentTime = 1;
-          
+
           const generateFrame = () => {
             try {
               ctx.drawImage(v, 0, 0, canvas.width, canvas.height);
@@ -99,7 +99,7 @@
                 v.setAttribute('poster', dataURL);
                 console.log(`Poster generado para video ${index + 1}`);
               }
-            } catch(e) {
+            } catch (e) {
               console.log(`No se pudo generar poster para video ${index + 1}:`, e);
             }
             v.pause();
@@ -108,15 +108,15 @@
 
           // Esperar a que llegue al segundo 1
           v.addEventListener('seeked', generateFrame, { once: true });
-          
-        } catch(e) {
+
+        } catch (e) {
           console.log(`Error generando poster para video ${index + 1}:`, e);
         }
       };
 
       // Intentar cuando carguen los metadatos
       v.addEventListener('loadedmetadata', attemptPosterGeneration, { once: true });
-      
+
       // Forzar carga de metadatos
       if (v.readyState >= 1) {
         attemptPosterGeneration();
@@ -138,7 +138,7 @@
 })();
 
 // Control de FABs (WhatsApp y Volver arriba)
-function setupFabs(){
+function setupFabs() {
   const fabWa = document.getElementById('cta-whatsapp-fab');
   const fabTop = document.getElementById('btn-top');
   const heroCta = document.getElementById('cta-whatsapp-hero');
@@ -146,7 +146,7 @@ function setupFabs(){
   if (!fabWa || !fabTop || !heroCta) return;
 
   // Vincula enlace WA al FAB usando mismo origen "fab"
-  try{
+  try {
     const origin = fabWa.getAttribute('data-origin') || 'fab';
     // reutilizamos la función privada si existiera; si no, recomponemos rápido
     const phone = '51998693529';
@@ -159,7 +159,7 @@ function setupFabs(){
     const hour = new Date().getHours();
     const quick = hour >= 21 || hour < 7 ? 'Atención 24/7' : 'Atención inmediata';
     const defaultMsg = `Hola, quisiera una cotización para una serenata con Mariachis Los Peruchos en Lima. ${quick}. Fecha: ____ , Distrito: ____ , Paquete: ____ .`;
-    const text = encodeURIComponent(defaultMsg + ` (Origen: ${origin})`);
+    const text = defaultMsg + ` (Origen: ${origin})`;
     const url = new URL(BASE_WA);
     url.searchParams.set('text', text);
     url.searchParams.set('utm_source', utmSource);
@@ -169,12 +169,12 @@ function setupFabs(){
     url.searchParams.set('utm_content', origin);
     fabWa.href = url.toString();
     fabWa.target = '_blank'; fabWa.rel = 'noopener';
-  }catch(e){}
+  } catch (e) { }
 
   // Observa solo el CTA del hero (más simple y robusto)
   let heroVisible = true;
   const updateFabs = () => {
-    if (heroVisible){
+    if (heroVisible) {
       fabWa.classList.remove('show');
       fabTop.classList.remove('show');
     } else {
@@ -191,7 +191,7 @@ function setupFabs(){
       }
     });
   }, { threshold: [0, 0.01] });
-  
+
   io.observe(heroCta);
 
   // Acción del botón Subir
@@ -201,12 +201,12 @@ function setupFabs(){
 }
 
 // Menú hamburguesa en móviles
-function setupMobileNav(){
+function setupMobileNav() {
   const toggle = document.getElementById('nav-toggle');
   const nav = document.getElementById('site-nav');
   if (!toggle || !nav) return;
-  function open(){ nav.classList.add('open'); toggle.setAttribute('aria-expanded','true'); }
-  function close(){ nav.classList.remove('open'); toggle.setAttribute('aria-expanded','false'); }
+  function open() { nav.classList.add('open'); toggle.setAttribute('aria-expanded', 'true'); }
+  function close() { nav.classList.remove('open'); toggle.setAttribute('aria-expanded', 'false'); }
   toggle.addEventListener('click', () => {
     if (nav.classList.contains('open')) close(); else open();
   });
